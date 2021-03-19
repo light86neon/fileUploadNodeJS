@@ -2,7 +2,7 @@ const User = require('../dataBase/models/User');
 require('../dataBase/models/Car');
 
 module.exports = {
-    findUsers: (query = {}) => {
+    findUsers: async (query = {}) => {
         // limit , page використовуємо для пагінації;
         const { limit = 20, page = 1, ...filters } = query;
         // кількість сторінок яких потрібно пропустити
@@ -29,7 +29,14 @@ module.exports = {
             }
         });
 
-        User.find(filterObject).limit(+limit).skip(skip);
+        const user = await User.find(filterObject).limit(+limit).skip(skip);
+        const count = await User.countDocuments(filterObject);
+
+        return {
+            data: users,
+            page,
+            limit
+        }
     },
 
     findUserById: (userId) => User.findById(userId),
