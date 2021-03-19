@@ -4,11 +4,13 @@ require('../dataBase/models/Car');
 module.exports = {
     findUsers: async (query = {}) => {
         // limit , page використовуємо для пагінації;
-        const { limit = 20, page = 1, ...filters } = query;
+        const { limit = 20, page = 1, sortBy = 'createdAt', order = 'asc', ...filters } = query;
         // кількість сторінок яких потрібно пропустити
         const skip = (page - 1) * limit;
         const keys = Object.keys(filters);
         const filterObject = {};
+        const orderBy = order === 'asc' ? -1 : 1;
+        const sort = { [sortBy]: orderBy };
 
         keys.forEach((key) => {
             switch (key) {
@@ -35,8 +37,10 @@ module.exports = {
         return {
             data: users,
             page,
-            limit
-        }
+            limit,
+            count,
+            pages: Math.ceil(count/limit)
+        };
     },
 
     findUserById: (userId) => User.findById(userId),
