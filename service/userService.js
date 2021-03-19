@@ -13,17 +13,23 @@ module.exports = {
         keys.forEach((key) => {
             switch (key) {
                 case 'priceGte':
-                    filterObject.price = { $gte: filters.priceGte };
+                    filterObject.price = Object.assign({ ...filterObject.price, $lte: +filters.priceGte });
                     break;
                 case 'priceLte':
-                    filterObject.price = { ...filterObject.price, $lte: +filters.priceLte };
+                    filterObject.price = Object.assign({ ...filterObject.price, $lte: +filters.priceLte });
+                    break;
+                case 'category':
+                    let categories = filters.category.split(';');
+                    filterObject.category = { $in: categories};
+                case 'name':
+                    filterObject.name = { $regexp: filters.name, $options: 'i' };
                     break;
                 default:
                     filterObject[key] = filters[key];
             }
         });
 
-        User.find(filterObject).limit(limit).skip(skip);
+        User.find(filterObject).limit(+limit).skip(skip);
     },
 
     findUserById: (userId) => User.findById(userId),
